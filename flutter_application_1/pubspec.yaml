@@ -1,0 +1,40 @@
+name: flutter_application_1
+description: Application de gestion budgétaire et suivi des dépenses.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  fl_chart: ^0.71.0
+  provider: ^6.1.2
+  sqflite: ^2.4.2
+  path_provider: ^2.1.5
+  uuid: ^4.5.0
+  path: ^1.9.0  # Ajusté à 1.9.0 pour éviter le conflit
+  shared_preferences: ^2.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Pour ajouter des images ou autres fichiers d'assets :
+  # assets:
+  #   - assets/images/
+  
+  # Pour utiliser des polices personnalisées :
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
