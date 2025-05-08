@@ -1,27 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/transaction.dart';
+import '../../models/category.dart';
 import '../../providers/transaction_provider.dart';
 import '../../services/BudgetService.dart';
 
-class TransactionListPage extends StatelessWidget {
-  final VoidCallback? onLogout; // Optional parameter for logout
+class TransactionListPage extends StatefulWidget {
+  final VoidCallback? onLogout;
 
   const TransactionListPage({super.key, this.onLogout});
 
-  Future<String> _getTransactionType(BuildContext context, Transaction transaction) async {
+  @override
+  _TransactionListPageState createState() => _TransactionListPageState();
+}
+
+class _TransactionListPageState extends State<TransactionListPage> {
+  Map<String, String> _categoryMap = {}; // id -> name
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
     final budgetService = BudgetService();
-    final db = await budgetService.getDatabase();
-    final List<Map<String, dynamic>> categoryMaps = await db.query(
-      'categories',
-      where: 'id = ?',
-      whereArgs: [transaction.category],
-    );
-    if (categoryMaps.isNotEmpty) {
-      final isIncome = categoryMaps.first['isIncome'] == 1;
-      return isIncome ? 'income' : 'expense';
-    }
-    return 'unknown';
+    final categories = await budgetService.getCategories();
+    setState(() {
+      _categoryMap = {
+        for (var cat in categories) (cat.id?.toString() ?? ''): cat.name
+      };
+      _loading = false;
+    });
   }
 
   @override
@@ -34,44 +45,48 @@ class TransactionListPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          if (onLogout != null)
+          if (widget.onLogout != null)
             IconButton(
               icon: const Icon(Icons.logout),
-              onPressed: onLogout,
+              onPressed: widget.onLogout,
             ),
         ],
       ),
-      body: Consumer<TransactionProvider>(
-        builder: (context, provider, child) {
-          return ListView.builder(
-            itemCount: provider.transactions.length,
-            itemBuilder: (context, index) {
-              final transaction = provider.transactions[index];
-              return FutureBuilder<String>(
-                future: _getTransactionType(context, transaction),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const ListTile(
-                      title: Text('Loading...'),
-                    );
-                  }
-                  final transactionType = snapshot.data!;
-                  return ListTile(
-                    title: Text(transaction.category),
-                    subtitle: Text(transaction.date),
-                    trailing: Text(
-                      '${transactionType == 'income' ? '+' : '-'}${transaction.amount} DT',
-                      style: TextStyle(
-                        color: transactionType == 'income' ? Colors.green : Colors.red,
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : Consumer<TransactionProvider>(
+              builder: (context, provider, _) {
+                final transactions = provider.transactions;
+
+                if (transactions.isEmpty) {
+                  return const Center(child: Text('Aucune transaction trouvée'));
+                }
+
+                return ListView.builder(
+                  itemCount: transactions.length,
+                  itemBuilder: (context, index) {
+                    final transaction = transactions[index];
+                    final isIncome = transaction.type == 'income';
+                    final categoryName = _categoryMap[transaction.category] ?? 'Inconnue';
+
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: isIncome ? Colors.green : Colors.red,
+                        child: Text(
+                          (isIncome ? '+' : '-') + transaction.amount.toString(),
+                          style: const TextStyle(color: Colors.white, fontSize: 12),
+                        ),
                       ),
-                    ),
-                  );
-                },
-              );
-            },
-          );
-        },
-      ),
+                      title: Text(transaction.description ?? 'Aucune description'),
+                      subtitle: Text(
+                        'Catégorie : $categoryName, Date : ${transaction.date}',
+                      ),
+                      trailing: Text(transaction.type),
+                    );
+                  },
+                );
+              },
+            ),
     );
   }
 }
