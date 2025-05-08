@@ -2,29 +2,30 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class ChartView extends StatelessWidget {
-  const ChartView({super.key});
+  final Map<String, double> data; // clé = catégorie, valeur = total
+
+  const ChartView({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
+    final colors = [Colors.blue, Colors.red, Colors.green, Colors.orange, Colors.purple];
+    final List<PieChartSectionData> sections = [];
+
+    int index = 0;
+    data.forEach((category, value) {
+      sections.add(
+        PieChartSectionData(
+          value: value,
+          title: category,
+          color: colors[index % colors.length],
+        ),
+      );
+      index++;
+    });
+
     return PieChart(
       PieChartData(
-        sections: [
-          PieChartSectionData(
-            value: 40,
-            title: 'Food',
-            color: Colors.blue,
-          ),
-          PieChartSectionData(
-            value: 30,
-            title: 'Transport',
-            color: Colors.red,
-          ),
-          PieChartSectionData(
-            value: 30,
-            title: 'Others',
-            color: Colors.green,
-          ),
-        ],
+        sections: sections,
       ),
     );
   }

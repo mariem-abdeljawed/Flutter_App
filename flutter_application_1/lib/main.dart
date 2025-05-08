@@ -9,15 +9,19 @@ import 'package:flutter_application_1/views/dashboard/overview_page.dart';
 import 'package:flutter_application_1/views/transaction/add_transaction_page.dart';
 import 'package:flutter_application_1/views/transaction/transactionlistpage.dart';
 import 'package:flutter_application_1/views/settings/settings_page.dart';
+import 'package:flutter_application_1/views/category/CategoryPage.dart'; // Ajouté
+import 'package:flutter_application_1/views/category/CreateCategoryPage.dart'; // Ajouté (optionnel, géré via navigation)
+import 'package:flutter_application_1/views/report/reportpage.dart'; // ✅ Ajouté pour la page Report
 import 'package:provider/provider.dart';
-
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (!kIsWeb) {
-    await DatabaseService.instance.database;
+    // Initialisation de la base de données avec création des tables
+    final db = await DatabaseService.instance.database;
+    // Assurez-vous que les tables sont créées (déjà géré dans DatabaseService._createDB)
   }
   runApp(const MyApp());
 }
@@ -38,9 +42,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(primarySwatch: Colors.blue),
         initialRoute: '/login',
         routes: {
-         '/login': (context) => const LoginPage(),
-
-              
+          '/login': (context) => const LoginPage(),
           '/overview': (context) => OverviewPage(
                 onNavigateToTransactions: () {
                   Navigator.pushNamed(context, '/transactions');
@@ -50,6 +52,9 @@ class MyApp extends StatelessWidget {
                 },
                 onNavigateToSettings: () {
                   Navigator.pushNamed(context, '/settings');
+                },
+                onNavigateToCategories: () {
+                  Navigator.pushNamed(context, '/categories');
                 },
                 onLogout: () {
                   Provider.of<AuthProvider>(context, listen: false).signOut();
@@ -74,6 +79,8 @@ class MyApp extends StatelessWidget {
                   Navigator.pushReplacementNamed(context, '/login');
                 },
               ),
+          '/categories': (context) => const CategoryPage(),
+          '/report': (context) => const ReportPage(), // ✅ Route ajoutée
         },
       ),
     );
