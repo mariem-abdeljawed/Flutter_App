@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
                 },
               ),
           '/categories': (context) => const CategoryPage(),
-          '/report': (context) => const ReportPage(), // ✅ Route ajoutée
+          '/report': (context) => const ReportPage(),
         },
       ),
     );
