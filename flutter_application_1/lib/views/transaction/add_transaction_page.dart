@@ -97,7 +97,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
             ? const Center(child: CircularProgressIndicator())
             : _categories.isEmpty
                 ? const Center(child: Text('No categories available'))
-                : SingleChildScrollView( // Ajouté pour éviter le "Bottom overflowed" sur petits écrans
+                : SingleChildScrollView( 
                     child: Form(
                       key: _formKey,
                       child: Column(

@@ -15,7 +15,7 @@ class TransactionListPage extends StatefulWidget {
 }
 
 class _TransactionListPageState extends State<TransactionListPage> {
-  Map<String, String> _categoryMap = {}; // id -> name
+  Map<String, String> _categoryMap = {}; 
   bool _loading = true;
 
   @override
